@@ -49,6 +49,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(project(":library"))
+            //implementation(libs.easy.datastore)
             implementation(libs.androidx.datastore.preferences.core)
         }
         desktopMain.dependencies {

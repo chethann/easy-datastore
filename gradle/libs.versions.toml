@@ -16,6 +16,7 @@ junit = "4.13.2"
 kotlin = "2.0.21"
 kotlinx-coroutines = "1.9.0"
 dataStoreVersion = "1.1.1"
+easy-datastore = "1.0.0-alpha1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -34,6 +35,7 @@ kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-co
 
 androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "dataStoreVersion" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "dataStoreVersion" }
+easy-datastore = { group = "io.github.chethann", name = "easy-datastore", version.ref = "easy-datastore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

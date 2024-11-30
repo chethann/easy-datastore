@@ -1,21 +1,74 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
+A wrapper around Multiplatform Datastore to expose easy to use API to store and retrieve key value pairs.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+Usage
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+```kotlin
+class TestDataStore(
+    context: Any? = null,
+    path: String? = null
+): AbstractPreferenceDataStore(PREFERENCE_NAME, context = context, path = path) {
 
+    fun getTestString(): Flow<String?> {
+        return getAsync(TEST_STRING_KEY)
+    }
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+    suspend fun setTestString(value: String) {
+        set(TEST_STRING_KEY, value)
+    }
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+    companion object {
+        private const val PREFERENCE_NAME = "testPreference"
+        private val TEST_STRING_KEY = stringPreferencesKey("TEST_STRING")
+    }
+}
+```
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+Example usage of TestDataStore in a composable
+
+```kotlin
+@Composable
+fun Screen(testDataStore: TestDataStore) {
+    var preferenceValue by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = remember {
+        CoroutineScope(Dispatchers.IO)
+    }
+
+    LaunchedEffect(Unit) {
+        testDataStore.getTestString().collect {
+            preferenceValue = it
+        }
+    }
+
+    Column {
+        var text by remember { mutableStateOf("") }
+
+        TextField(
+            value = text,
+            onValueChange = {
+                text = it
+            }
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Button(onClick = {
+            coroutineScope.launch { testDataStore.setTestString(text) }
+        }) {
+            Text("Save")
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Text("Stored value: $preferenceValue")
+
+    }
+}
+```
+
+You can specify the data store file location using, path variable
+
+```kotlin
+        val testDataStore = remember { TestDataStore(path = "${System.getProperty("user.home")}/Library/Application Support/sdsadsad") }
+``` 
+
+Note: Either context or path in AbstractPreferenceDataStore is mandatory in Android. An exception is thrown is both are not set.   
